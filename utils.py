@@ -62,6 +62,19 @@ def detect_objects(model: YOLO, image: Image, conf: float = 0.5, iou: float = 0.
 # Model and data loading
 # ---------------------------------------------------------------------
 
+
+def get_dataset_image_path(image_path):
+    """
+    The preparation script stores paths such as 'media/train/...'.
+    DATASET_DIR already points to the media directory, so remove that
+    optional leading 'media/' component.
+    """
+    normalized = str(image_path).replace("\\", "/").lstrip("/")
+    if normalized.startswith("media/"):
+        normalized = normalized[len("media/"):]
+    return DATASET_DIR / normalized
+
+
 def load_json(path):
     if not path.exists():
         raise FileNotFoundError(f"Required metadata file not found: {path}")
