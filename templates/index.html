@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Grocery Image Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="page-header">
+            <p class="eyebrow">AI IMAGE SEARCH WORKSHOP</p>
+            <h1>Find visually similar grocery products</h1>
+            <p class="subtitle">Upload an image, detect an object, and search the GroceryStoreDataset.</p>
+        </header>
+
+        <nav class="steps" aria-label="Workflow">
+            <div class="step active" data-step="1"><span>1</span> Upload</div>
+            <div class="step" data-step="2"><span>2</span> Detect</div>
+            <div class="step" data-step="3"><span>3</span> Search</div>
+        </nav>
+
+        <section class="panel" id="upload-panel">
+            <div class="section-heading">
+                <div>
+                    <p class="step-label">STAGE 01</p>
+                    <h2>Upload an image</h2>
+                    <p class="muted">Choose a grocery image from your computer.</p>
+                </div>
+            </div>
+
+            <form id="upload-form">
+                <label class="drop-zone" for="image-input">
+                    <span class="upload-icon">↑</span>
+                    <strong>Choose an image</strong>
+                    <span class="muted">PNG, JPG, JPEG or WEBP · Max 20 MB</span>
+                    <input id="image-input" name="image" type="file" accept="image/png,image/jpeg,image/webp" required>
+                </label>
+                <button class="button primary" type="submit">Upload image</button>
+            </form>
+
+            <div id="uploaded-preview" class="preview-area hidden">
+                <h3>Uploaded image</h3>
+                <img id="uploaded-image" class="uploaded-image" alt="Uploaded image">
+                <div class="image-meta" id="uploaded-filename"></div>
+                <button id="detect-button" class="button primary" type="button">Detect objects</button>
+            </div>
+        </section>
+
+        <section class="panel" id="detect-panel">
+            <div class="section-heading">
+                <div>
+                    <p class="step-label">STAGE 02</p>
+                    <h2>Detect and select an object</h2>
+                    <p class="muted">YOLO detects objects and saves each crop. Select one crop to search for similar images.</p>
+                </div>
+            </div>
+            <div id="detection-status" class="muted empty-state">Upload an image first, then click “Detect objects”.</div>
+            <div id="object-grid" class="object-grid"></div>
+        </section>
+
+        <section class="panel" id="search-panel">
+            <div class="section-heading">
+                <div>
+                    <p class="step-label">STAGE 03</p>
+                    <h2>Similar image search</h2>
+                    <p class="muted">Search the FAISS image index using the selected crop.</p>
+                </div>
+            </div>
+            <div id="selected-object" class="selected-object hidden">
+                <img id="selected-image" alt="Selected object">
+                <div>
+                    <strong id="selected-category"></strong>
+                    <p class="muted" id="selected-confidence"></p>
+                </div>
+                <button id="search-button" class="button primary" type="button">Search similar images</button>
+            </div>
+            <div id="search-status" class="muted empty-state">Select a detected object to start searching.</div>
+            <div id="results-grid" class="results-grid"></div>
+        </section>
+
+        <footer>Powered by YOLOv8 · OpenCLIP · FAISS · Flask</footer>
+    </main>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

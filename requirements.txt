@@ -1,0 +1,8 @@
+Flask
+pillow
+torch
+transformers
+numpy
+ultralytics
+faiss-cpu
+open-clip-torch

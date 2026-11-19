@@ -1,0 +1,8 @@
+__pycache__
+.venv/
+uploads/
+yolo*.pt
+*.index
+media/products.json
+media/product_images.json
+*_full.py
