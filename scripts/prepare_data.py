@@ -25,17 +25,27 @@ def load_models():
     print(f"Loading {MODEL_NAME}...")
     print(f"Device: {device}")
 
-    # @TODO
+    model, _, preprocess = open_clip.create_model_and_transforms(
+        model_name=MODEL_NAME,
+        pretrained=MODEL_PRETRAINED,
+    )
 
-    # return model, preprocess
+    model.to(device)
+    model.eval()
+
+    return model, preprocess
 
 
 def calculate_image_embedding(model, processor, image_path):
-    print(f'Calculate embeding for {image_path}')
+    with Image.open(image_path) as image:
+        image = image.convert("RGB")
+    
+    image = processor(image).unsqueeze(0).to(device)
 
-    # @TODO
+    with torch.no_grad():
+        embedding = model.encode_image(image).cpu().numpy().astype('float32')
 
-    # return embedding
+    return embedding
 
 
 def load_json(path):
