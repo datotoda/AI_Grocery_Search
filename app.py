@@ -10,7 +10,6 @@ from utils import (
     DATASET_DIR,
     UPLOAD_DIR,
     detect_objects,
-    get_dataset_image_path,
     load_resources,
     crop_object,
     search_similar_images,

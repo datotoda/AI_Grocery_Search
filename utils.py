@@ -33,27 +33,33 @@ def crop_object(image: Image, bbox: tuple) -> Image:
 
 
 def detect_objects(model: YOLO, image: Image, conf: float = 0.5, iou: float = 0.7) -> list:
-    results = model.predict(
-        source=image,
-        conf=conf,
-        iou=iou,
-        verbose=False
-    )
+    """
+    Example Output:
+    [
+        {
+            'bbox': (337, 119, 471, 270), 
+            'confidence': 0.9207653403282166, 
+            'class_id': 46, 
+            'category': 'banana'
+        }, 
+        {
+            'bbox': (460, 556, 560, 706), 
+            'confidence': 0.7962380051612854, 
+            'class_id': 39, 
+            'category': 'bottle'
+        }, 
+        {
+            'bbox': (290, 502, 341, 621), 
+            'confidence': 0.4161379635334015, 
+            'class_id': 39, 
+            'category': 'bottle'
+        }
+    ]
+    """
 
-    boxes_list = []
+    # @TODO
 
-    for result in results:
-        for box in result.boxes:
-            x1, y1, x2, y2 = box.xyxy[0].tolist()
-
-            boxes_list.append({
-                'bbox': (int(x1), int(y1), int(x2), int(y2)),
-                'confidence': float(box.conf[0]),
-                'class_id': int(box.cls[0]),
-                'category': model.names[int(box.cls[0])]
-            })
-
-    return boxes_list
+    # return boxes_list
 
 
 # ---------------------------------------------------------------------
@@ -70,31 +76,18 @@ def load_json(path):
 
 def load_models():
     print(f"Loading CLIP {CLIP_MODEL_NAME} ({CLIP_PRETRAINED}) on {DEVICE}...")
-    clip_model, _, preprocess = open_clip.create_model_and_transforms(
-        model_name=CLIP_MODEL_NAME,
-        pretrained=CLIP_PRETRAINED,
-    )
-    clip_model.to(DEVICE)
-    clip_model.eval()
 
-    print(f"Loading YOLO model: {YOLO_MODEL_NAME}...")
-    yolo_model = YOLO(YOLO_MODEL_NAME)
+    # @TODO
 
-    return clip_model, preprocess, yolo_model
+    # return clip_model, preprocess, yolo_model
 
 
 def calculate_image_embedding(model, preprocess, image_path):
-    with Image.open(image_path) as image:
-        image = image.convert("RGB")
+    pass
 
-    tensor = preprocess(image).unsqueeze(0).to(DEVICE)
+    # @TODO
 
-    with torch.no_grad():
-        embedding = model.encode_image(tensor)
-        embedding = embedding / embedding.norm(dim=-1, keepdim=True)
-        embedding = embedding.cpu().numpy().astype("float32")
-
-    return embedding
+    # return embedding
 
 
 def normalize_embeddings(embeddings):
@@ -184,55 +177,27 @@ def load_resources():
 # Dataset paths and similarity search
 # ---------------------------------------------------------------------
 
-def get_dataset_image_path(image_path):
-    """
-    The preparation script stores paths such as 'media/train/...'.
-    DATASET_DIR already points to the media directory, so remove that
-    optional leading 'media/' component.
-    """
-    normalized = str(image_path).replace("\\", "/").lstrip("/")
-    if normalized.startswith("media/"):
-        normalized = normalized[len("media/"):]
-    return DATASET_DIR / normalized
-
 
 def search_similar_images(resources, image_path, top_k=20):
-    query = calculate_image_embedding(
-        resources["clip_model"],
-        resources["preprocess"],
-        image_path,
-    )
-    query = normalize_embeddings(query)
-
-    index = resources["image_index"]
-    scores, indices = index.search(query, top_k)
+    
+    # @TODO scores, indices = index.search(query, top_k)
 
     results = []
-    for score, row_index in zip(scores[0], indices[0]):
-        if row_index < 0:
-            continue
+    # for score, row_index in zip(scores[0], indices[0]):
+    #     if row_index < 0:
+    #         continue
+    
+    #     # @TODO
 
-        dataset_path = resources["image_paths"][int(row_index)]
-        image_metadata = resources["product_images"].get(dataset_path, {})
-
-        class_id = image_metadata.get("class_id")
-        product = resources["products"].get(str(class_id), {})
-
-        full_path = get_dataset_image_path(dataset_path)
-        if not full_path.is_file():
-            # Keep the result visible in the response, but the image URL
-            # will not be useful if the underlying dataset file is missing.
-            continue
-
-        results.append({
-            "image_path": dataset_path,
-            "dataset_filename": full_path.relative_to(DATASET_DIR).as_posix(),
-            "similarity": round(float(score), 4),
-            "class_id": class_id,
-            "class_name": product.get("class_name", "Unknown"),
-            "coarse_class_name": product.get("coarse_class_name", "Unknown"),
-            "description": product.get("description", ""),
-            "split": image_metadata.get("split"),
-        })
+    #     results.append({
+    #         "image_path": dataset_path,
+    #         "dataset_filename": dataset_filename,
+    #         "similarity": round(float(score), 4),
+    #         "class_id": class_id,
+    #         "class_name": class_name,
+    #         "coarse_class_name": coarse_class_name,
+    #         "description": description,
+    #         "split": split,
+    #     })
 
     return results
